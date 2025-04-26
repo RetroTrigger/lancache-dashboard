@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log: {{ filename }} - Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Lancache Prefill Dashboard</h1>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('games') }}">Games</a></li>
+          <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+          <li><a href="{{ url_for('view_logs') }}" class="active">Logs</a></li>
+          <li><a href="{{ url_for('settings') }}">Settings</a></li>
+          <li><a href="{{ url_for('logout') }}" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h2>Log: {{ filename }}</h2>
+      <a href="{{ url_for('view_logs') }}" class="button secondary">Back to Logs</a>
+    </div>
+    
+    <div class="log-detail">
+      <div class="log-content">
+        <pre>{{ content }}</pre>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Lancache Prefill Dashboard &copy; 2025</p>
+    </div>
+  </footer>
+</body>
+</html>

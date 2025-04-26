@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-box">
+      <h1>Lancache Prefill Dashboard</h1>
+      <h2>Admin Login</h2>
+      
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for message in messages %}
+              <div class="message error">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
+      <form method="post" class="login-form">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter dashboard password" required autofocus />
+        </div>
+        <button type="submit" class="button primary">Login</button>
+      </form>
+      
+      <div class="login-footer">
+        <p>Enter the dashboard password to manage your lancache prefill tools.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

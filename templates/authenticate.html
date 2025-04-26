@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Authenticate {{ platform|capitalize }} - Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Lancache Prefill Dashboard</h1>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('games') }}" class="active">Games</a></li>
+          <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+          <li><a href="{{ url_for('view_logs') }}">Logs</a></li>
+          <li><a href="{{ url_for('settings') }}">Settings</a></li>
+          <li><a href="{{ url_for('logout') }}" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="page-header">
+      <h2>Authenticate {{ platform|capitalize }}</h2>
+      <a href="{{ url_for('manage_games', platform=platform) }}" class="button secondary">Back to {{ platform|capitalize }} Games</a>
+    </div>
+    
+    <div class="alert info">
+      <p><strong>Important:</strong> Your credentials will be securely passed to the {{ platform|capitalize }} prefill tool and not stored by the dashboard.</p>
+      <p>This is necessary for the prefill tool to authenticate with {{ platform|capitalize }} in a headless environment.</p>
+    </div>
+
+    {% if platform == 'steam' %}
+    <div class="alert warning">
+      <p><strong>Steam Guard:</strong> If your account has Steam Guard enabled, you'll need to enter the code in the next step.</p>
+      <p>The system will prompt you for the code after successful username/password validation.</p>
+    </div>
+    {% endif %}
+    
+    <div class="auth-container">
+      <div class="auth-card">
+        <h3>Enter {{ platform|capitalize }} Credentials</h3>
+        <form method="post" class="auth-form">
+          <div class="form-group">
+            {% if platform == 'steam' %}
+            <label for="username">Steam Username</label>
+            <input type="text" id="username" name="username" required>
+            {% elif platform == 'epic' %}
+            <label for="email">Epic Email</label>
+            <input type="email" id="email" name="email" required>
+            {% elif platform == 'battlenet' %}
+            <label for="email">Battle.net Email</label>
+            <input type="email" id="email" name="email" required>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          
+          {% if auth_step == 'mfa' %}
+          <div class="form-group">
+            <label for="mfa_code">Authentication Code</label>
+            <input type="text" id="mfa_code" name="mfa_code" required>
+            <span class="help-text">Enter the code from your authenticator app or email</span>
+          </div>
+          {% endif %}
+          
+          <div class="form-actions">
+            <button type="submit" name="authenticate" value="1" class="button primary">Authenticate</button>
+            <a href="{{ url_for('manage_games', platform=platform) }}" class="button secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+      
+      <div class="auth-help">
+        <h3>About {{ platform|capitalize }} Authentication</h3>
+        <p>The dashboard needs to authenticate with {{ platform|capitalize }} to:</p>
+        <ul>
+          <li>Retrieve your game library</li>
+          <li>Select games for prefilling</li>
+          <li>Download game data to the Lancache</li>
+        </ul>
+        <p>Your credentials are used directly by the {{ platform|capitalize }} prefill tool and are not permanently stored by the dashboard.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Lancache Prefill Dashboard &copy; 2025</p>
+    </div>
+  </footer>
+</body>
+</html>

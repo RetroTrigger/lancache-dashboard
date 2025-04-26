@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings - Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Lancache Prefill Dashboard</h1>
+      <div class="dark-mode-slider">
+  <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+  <label for="dark-mode-toggle">
+    <span class="slider"><span class="slider-thumb"></span></span>
+  </label>
+</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('games') }}">Games</a></li>
+          <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+          <li><a href="{{ url_for('view_logs') }}">Logs</a></li>
+          <li><a href="{{ url_for('settings') }}" class="active">Settings</a></li>
+          <li><a href="{{ url_for('logout') }}" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if message %}
+      <div class="message {{ 'error' if 'error' in message.lower() else 'success' }}">
+        {{ message }}
+      </div>
+    {% endif %}
+
+    <h2>Dashboard Settings</h2>
+    
+    <div class="settings-container">
+      <div class="settings-card">
+        <h3>Security Settings</h3>
+        <form method="post" class="settings-form">
+          <div class="form-group">
+            <label for="current_password">Current Password</label>
+            <input type="password" id="current_password" name="current_password" required>
+          </div>
+          <div class="form-group">
+            <label for="new_password">New Password</label>
+            <input type="password" id="new_password" name="new_password" required>
+          </div>
+          <div class="form-group">
+            <label for="confirm_password">Confirm New Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+          </div>
+          <button type="submit" name="update_password" value="1" class="button primary">Update Password</button>
+        </form>
+      </div>
+
+      <div class="settings-card">
+        <h3>Prefill Tool Paths</h3>
+        <form method="post" class="settings-form">
+          <div class="form-group">
+            <label for="steam_tool">Steam Prefill Tool</label>
+            <input type="text" id="steam_tool" name="tool_path" value="{{ config.prefill_tools.steam }}" placeholder="steamprefill">
+            <input type="hidden" name="platform" value="steam">
+          </div>
+          <button type="submit" name="update_tool_path" value="1" class="button primary">Update</button>
+        </form>
+
+        <form method="post" class="settings-form">
+          <div class="form-group">
+            <label for="epic_tool">Epic Prefill Tool</label>
+            <input type="text" id="epic_tool" name="tool_path" value="{{ config.prefill_tools.epic }}" placeholder="epicprefill">
+            <input type="hidden" name="platform" value="epic">
+          </div>
+          <button type="submit" name="update_tool_path" value="1" class="button primary">Update</button>
+        </form>
+
+        <form method="post" class="settings-form">
+          <div class="form-group">
+            <label for="battlenet_tool">Battle.net Prefill Tool</label>
+            <input type="text" id="battlenet_tool" name="tool_path" value="{{ config.prefill_tools.battlenet }}" placeholder="battlenetprefill">
+            <input type="hidden" name="platform" value="battlenet">
+          </div>
+          <button type="submit" name="update_tool_path" value="1" class="button primary">Update</button>
+        </form>
+      </div>
+      
+      <div class="settings-card">
+        <h3>System Information</h3>
+        <div class="system-info">
+          <p><strong>Dashboard Version:</strong> 1.0.0</p>
+          <p><strong>Server:</strong> {{ request.host }}</p>
+          <p><strong>Config File:</strong> {{ config.__file__ if config.__file__ is defined else 'Using default configuration' }}</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Lancache Prefill Dashboard &copy; 2025</p>
+    </div>
+  </footer>
+<script>
+(function() {
+  const toggle = document.getElementById('dark-mode-toggle');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved = localStorage.getItem('dashboard-dark-mode');
+  function setMode(dark) {
+    if (dark) {
+      document.body.classList.add('dark-mode');
+      toggle.checked = true;
+    } else {
+      document.body.classList.remove('dark-mode');
+      toggle.checked = false;
+    }
+  }
+  setMode(saved === 'dark' || (saved === null && prefersDark));
+  toggle.addEventListener('change', function() {
+    const isDark = toggle.checked;
+    document.body.classList.toggle('dark-mode', isDark);
+    localStorage.setItem('dashboard-dark-mode', isDark ? 'dark' : 'light');
+  });
+})();
+</script>
+</body>
+</html>

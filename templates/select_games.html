@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Select {{ platform|capitalize }} Games{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="content-header">
+    <h1>Select {{ platform|capitalize }} Games</h1>
+    <div class="dark-mode-slider">
+  <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+  <label for="dark-mode-toggle">
+    <span class="slider"><span class="slider-thumb"></span></span>
+  </label>
+</div>
+    <div class="content-actions">
+      <a href="{{ url_for('manage_games', platform=platform) }}" class="button secondary">
+        <i class="icon-back"></i> Back to Games
+      </a>
+    </div>
+  </div>
+
+  <div class="alert info">
+    <p><strong>Select the games</strong> you want to prefill from your {{ platform|capitalize }} library.</p>
+    <p>The dashboard will manage these selections for you. You can come back and change your selection at any time.</p>
+  </div>
+
+  <div class="selection-card">
+    <form method="post">
+      <div class="search-controls">
+        <input type="text" id="game-search" placeholder="Search games..." class="search-input">
+        <div class="filter-actions">
+          <button type="button" id="select-all" class="button mini">Select All</button>
+          <button type="button" id="deselect-all" class="button mini secondary">Deselect All</button>
+        </div>
+      </div>
+
+      <div class="game-selection-list">
+        {% if library|length == 0 %}
+          <div class="empty-state">
+            <p>No games found in your {{ platform|capitalize }} library.</p>
+            <p>Make sure you have authenticated with {{ platform|capitalize }} first.</p>
+          </div>
+        {% else %}
+          {% for game in library %}
+            <div class="game-item" data-name="{{ game.name|lower }}">
+              <label class="game-selection">
+                <input type="checkbox" name="game_ids" value="{{ game.id }}" 
+                  {% if game.id in selected_games %} checked {% endif %}>
+                <span class="game-name">{{ game.name }}</span>
+                {% if game.size and game.size > 0 %}
+                <span class="game-size">{{ (game.size / 1073741824)|round(1) }} GB</span>
+                {% endif %}
+              </label>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="selection-actions">
+        <span id="selected-count">0</span> games selected
+        <button type="submit" name="save_selection" value="1" class="button primary">Save Selection</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('game-search');
+    const gameItems = document.querySelectorAll('.game-item');
+    const checkboxes = document.querySelectorAll('input[name="game_ids"]');
+    const selectedCount = document.getElementById('selected-count');
+    
+    // Update selected count on load
+    updateSelectedCount();
+    
+    // Search function
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      gameItems.forEach(item => {
+        const gameName = item.getAttribute('data-name');
+        if (gameName.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+    
+    // Select/deselect all buttons
+    document.getElementById('select-all').addEventListener('click', function() {
+      checkboxes.forEach(checkbox => {
+        const item = checkbox.closest('.game-item');
+        if (item.style.display !== 'none') {
+          checkbox.checked = true;
+        }
+      });
+      updateSelectedCount();
+    });
+    
+    document.getElementById('deselect-all').addEventListener('click', function() {
+      checkboxes.forEach(checkbox => {
+        const item = checkbox.closest('.game-item');
+        if (item.style.display !== 'none') {
+          checkbox.checked = false;
+        }
+      });
+      updateSelectedCount();
+    });
+    
+    // Track changes to selection count
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateSelectedCount);
+    });
+    
+    function updateSelectedCount() {
+      const checkedCount = document.querySelectorAll('input[name="game_ids"]:checked').length;
+      selectedCount.textContent = checkedCount;
+    }
+  });
+</script>
+{% endblock %}

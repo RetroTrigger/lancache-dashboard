@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logs - Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Lancache Prefill Dashboard</h1>
+      <div class="dark-mode-slider">
+        <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+        <label for="dark-mode-toggle">
+          <span class="slider"><span class="slider-thumb"></span></span>
+        </label>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('games') }}">Games</a></li>
+          <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+          <li><a href="{{ url_for('view_logs') }}" class="active">Logs</a></li>
+          <li><a href="{{ url_for('settings') }}">Settings</a></li>
+          <li><a href="{{ url_for('logout') }}" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Prefill Logs</h2>
+    
+    <div class="logs-container">
+      {% if logs %}
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Date/Time</th>
+              <th>Size</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+              <tr>
+                <td>{{ log.platform|capitalize }}</td>
+                <td>{{ log.time }}</td>
+                <td>{{ (log.size / 1024)|round(1) }} KB</td>
+                <td>
+                  <a href="{{ url_for('view_log_file', filename=log.filename) }}" class="button small">View Log</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="empty-state">No logs available</p>
+      {% endif %}
+    </div>
+    
+    <div class="logs-help">
+      <h3>Understanding Logs</h3>
+      <p>Logs show details of prefill job executions including:</p>
+      <ul>
+        <li>Games being prefilled</li>
+        <li>Download progress and sizes</li>
+        <li>Errors and warnings</li>
+        <li>Cache status and hits</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Lancache Prefill Dashboard &copy; 2025</p>
+    </div>
+  </footer>
+<script>
+(function() {
+  var toggle = document.getElementById('dark-mode-toggle');
+  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  function setMode(isDark) {
+    document.body.classList.toggle('dark-mode', isDark);
+    if(toggle) toggle.checked = isDark;
+  }
+  var saved = localStorage.getItem('dashboard-dark-mode');
+  setMode(saved === 'dark' || (saved === null && prefersDark));
+  if(toggle) {
+    toggle.addEventListener('change', function() {
+      var isDark = toggle.checked;
+      document.body.classList.toggle('dark-mode', isDark);
+      localStorage.setItem('dashboard-dark-mode', isDark ? 'dark' : 'light');
+    });
+  }
+})();
+</script>
+</body>
+</html>

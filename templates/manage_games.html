@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage {{ platform|capitalize }} Games - Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Lancache Prefill Dashboard</h1>
+      <div class="dark-mode-slider">
+  <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+  <label for="dark-mode-toggle">
+    <span class="slider"><span class="slider-thumb"></span></span>
+  </label>
+</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('games') }}" class="active">Games</a></li>
+          <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+          <li><a href="{{ url_for('view_logs') }}">Logs</a></li>
+          <li><a href="{{ url_for('settings') }}">Settings</a></li>
+          <li><a href="{{ url_for('logout') }}" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="page-header">
+      <h2>Manage {{ platform|capitalize }} Games</h2>
+      <div class="page-actions">
+        <a href="{{ url_for('authenticate', platform=platform) }}" class="button auth">
+          <i class="icon-key"></i> Authenticate {{ platform|capitalize }}
+        </a>
+        <form method="post" class="inline-form">
+          <button type="submit" name="run_select_apps" value="1" class="button primary">
+            Run {{ platform|capitalize }} Select-Apps Tool
+          </button>
+        </form>
+        <a href="{{ url_for('games') }}" class="button secondary">Back to Games</a>
+      </div>
+    </div>
+    
+    <div class="alert info">
+      <p><strong>Note:</strong> You can add games manually below or use the native {{ platform|capitalize }} select-apps tool for an interactive experience that shows all your owned games.</p>
+      <p>Using the native tool will open a separate window with an interactive selection menu. Your selections there will be used for prefill runs.</p>
+    </div>
+
+    <div class="game-management">
+      <div class="prefill-tools-card">
+        <h3>{{ platform|capitalize }} Prefill Tools</h3>
+        <p>Use the official {{ platform|capitalize }} prefill tools to select and manage games.</p>
+        
+        <div class="tool-actions">
+          <a href="{{ url_for('select_games', platform=platform) }}" class="button primary tool-button">
+            <i class="icon-select"></i> Select Games
+          </a>
+          <p class="tool-description">Opens the {{ platform|capitalize }} game selection interface where you can browse and select games from your library.</p>
+          
+          <form method="post" class="action-form">
+            <button type="submit" name="refresh_games" value="1" class="button secondary tool-button">
+              <i class="icon-refresh"></i> Refresh Game List
+            </button>
+            <p class="tool-description">Updates the dashboard with the latest selections from the {{ platform|capitalize }} prefill tool.</p>
+          </form>
+        </div>
+        
+        <div class="alert info">
+          <p><strong>How it works:</strong> The dashboard syncs with the {{ platform|capitalize }} prefill tool's selections.</p>
+          <p>Any changes made using the Select Games tool will be reflected in the dashboard after refreshing.</p>
+        </div>
+      </div>
+
+      <div class="game-list-card">
+        <h3>{{ platform|capitalize }} Games ({{ games|length }})</h3>
+        {% if games %}
+          <table class="game-table">
+            <thead>
+              <tr>
+                <th>Game Name</th>
+                <th>ID</th>
+                <th>Added</th>
+                <th>Last Prefilled</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for game in games %}
+                <tr>
+                  <td>{{ game.name }}</td>
+                  <td><code>{{ game.id }}</code></td>
+                  <td>{{ game.added|replace('T', ' ')|truncate(16, True, '') if game.added else 'N/A' }}</td>
+                  <td>{{ game.last_prefilled|replace('T', ' ')|truncate(16, True, '') if game.last_prefilled else 'Never' }}</td>
+                  <td>
+                    <form method="post" class="inline-form">
+                      <input type="hidden" name="game_id" value="{{ game.id }}">
+                      <button type="submit" name="delete_game" value="1" class="button small danger">Remove</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="empty-state">No {{ platform|capitalize }} games configured yet</p>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Lancache Prefill Dashboard &copy; 2025</p>
+    </div>
+  </footer>
+<script>
+(function() {
+  const toggle = document.getElementById('dark-mode-toggle');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved = localStorage.getItem('dashboard-dark-mode');
+  function setMode(dark) {
+    if (dark) {
+      document.body.classList.add('dark-mode');
+      toggle.checked = true;
+    } else {
+      document.body.classList.remove('dark-mode');
+      toggle.checked = false;
+    }
+  }
+  setMode(saved === 'dark' || (saved === null && prefersDark));
+  toggle.addEventListener('change', function() {
+    const isDark = toggle.checked;
+    document.body.classList.toggle('dark-mode', isDark);
+    localStorage.setItem('dashboard-dark-mode', isDark ? 'dark' : 'light');
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+    "password": "admin",
+    "games": {
+        "steam": [],
+        "epic": [],
+        "battlenet": []
+    },
+    "schedules": [],
+    "prefill_tools": {
+        "steam": "steamprefill",
+        "epic": "epicprefill",
+        "battlenet": "battlenetprefill"
+    }
+}

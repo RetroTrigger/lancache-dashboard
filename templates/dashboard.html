@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Lancache Prefill Dashboard</h1>
+      <div class="dark-mode-slider">
+  <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+  <label for="dark-mode-toggle">
+    <span class="slider"><span class="slider-thumb"></span></span>
+  </label>
+</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>
+          <li><a href="{{ url_for('games') }}">Games</a></li>
+          <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+          <li><a href="{{ url_for('view_logs') }}">Logs</a></li>
+          <li><a href="{{ url_for('settings') }}">Settings</a></li>
+          <li><a href="{{ url_for('logout') }}" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="dashboard-grid">
+      <!-- Stats Overview -->
+      <section class="dashboard-card stats">
+        <h2>Overview</h2>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <h3>Steam</h3>
+            <span class="stat-value">{{ game_counts.steam }}</span>
+            <span class="stat-label">games</span>
+            <a href="{{ url_for('run_prefill', platform='steam') }}" class="button">Run Prefill</a>
+          </div>
+          <div class="stat-item">
+            <h3>Epic</h3>
+            <span class="stat-value">{{ game_counts.epic }}</span>
+            <span class="stat-label">games</span>
+            <a href="{{ url_for('run_prefill', platform='epic') }}" class="button">Run Prefill</a>
+          </div>
+          <div class="stat-item">
+            <h3>Battle.net</h3>
+            <span class="stat-value">{{ game_counts.battlenet }}</span>
+            <span class="stat-label">games</span>
+            <a href="{{ url_for('run_prefill', platform='battlenet') }}" class="button">Run Prefill</a>
+          </div>
+          <div class="stat-item total">
+            <h3>Total</h3>
+            <span class="stat-value">{{ total_games }}</span>
+            <span class="stat-label">games</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Jobs -->
+      <section class="dashboard-card active-jobs">
+        <h2>Active Jobs</h2>
+        {% if active_jobs %}
+          <table>
+            <thead>
+              <tr>
+                <th>Platform</th>
+                <th>Started</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for job in active_jobs %}
+                <tr>
+                  <td>{{ job.platform|capitalize }}</td>
+                  <td>{{ job.started }}</td>
+                  <td><span class="status running">Running</span></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="empty-state">No active prefill jobs</p>
+        {% endif %}
+      </section>
+
+      <!-- Upcoming Schedule -->
+      <section class="dashboard-card upcoming">
+        <h2>Upcoming Schedules</h2>
+        {% if upcoming %}
+          <table>
+            <thead>
+              <tr>
+                <th>Platform</th>
+                <th>Next Run</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for schedule in upcoming %}
+                <tr>
+                  <td>{{ schedule.platform|capitalize }}</td>
+                  <td>{{ schedule.next_run }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="empty-state">No scheduled tasks</p>
+          <a href="{{ url_for('schedule') }}" class="button">Create Schedule</a>
+        {% endif %}
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="dashboard-card quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-buttons">
+          <a href="{{ url_for('games') }}" class="button">Manage Games</a>
+          <a href="{{ url_for('schedule') }}" class="button">Manage Schedules</a>
+          <a href="{{ url_for('view_logs') }}" class="button">View Logs</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Lancache Prefill Dashboard &copy; 2025</p>
+    </div>
+  </footer>
+<script>
+(function() {
+  const toggle = document.getElementById('dark-mode-toggle');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved = localStorage.getItem('dashboard-dark-mode');
+  function setMode(dark) {
+    if (dark) {
+      document.body.classList.add('dark-mode');
+      toggle.checked = true;
+    } else {
+      document.body.classList.remove('dark-mode');
+      toggle.checked = false;
+    }
+  }
+  setMode(saved === 'dark' || (saved === null && prefersDark));
+  toggle.addEventListener('change', function() {
+    const isDark = toggle.checked;
+    document.body.classList.toggle('dark-mode', isDark);
+    localStorage.setItem('dashboard-dark-mode', isDark ? 'dark' : 'light');
+  });
+})();
+</script>
+</body>
+</html>

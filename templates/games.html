@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Games - Lancache Prefill Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Lancache Prefill Dashboard</h1>
+      <div class="dark-mode-slider">
+  <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+  <label for="dark-mode-toggle">
+    <span class="slider"><span class="slider-thumb"></span></span>
+  </label>
+</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('games') }}" class="active">Games</a></li>
+          <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+          <li><a href="{{ url_for('view_logs') }}">Logs</a></li>
+          <li><a href="{{ url_for('settings') }}">Settings</a></li>
+          <li><a href="{{ url_for('logout') }}" class="logout">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Game Libraries</h2>
+    
+    <div class="platform-cards">
+      <div class="platform-card steam">
+        <h3>Steam Games</h3>
+        <p>{{ games.steam|length }} games configured</p>
+        <div class="platform-actions">
+          <a href="{{ url_for('manage_games', platform='steam') }}" class="button">Manage Games</a>
+          <a href="{{ url_for('run_prefill', platform='steam') }}" class="button secondary">Run Prefill</a>
+        </div>
+      </div>
+      
+      <div class="platform-card epic">
+        <h3>Epic Games</h3>
+        <p>{{ games.epic|length }} games configured</p>
+        <div class="platform-actions">
+          <a href="{{ url_for('manage_games', platform='epic') }}" class="button">Manage Games</a>
+          <a href="{{ url_for('run_prefill', platform='epic') }}" class="button secondary">Run Prefill</a>
+        </div>
+      </div>
+      
+      <div class="platform-card battlenet">
+        <h3>Battle.net Games</h3>
+        <p>{{ games.battlenet|length }} games configured</p>
+        <div class="platform-actions">
+          <a href="{{ url_for('manage_games', platform='battlenet') }}" class="button">Manage Games</a>
+          <a href="{{ url_for('run_prefill', platform='battlenet') }}" class="button secondary">Run Prefill</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Lancache Prefill Dashboard &copy; 2025</p>
+    </div>
+  </footer>
+<script>
+(function() {
+  const toggle = document.getElementById('dark-mode-toggle');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved = localStorage.getItem('dashboard-dark-mode');
+  function setMode(dark) {
+    if (dark) {
+      document.body.classList.add('dark-mode');
+      toggle.checked = true;
+    } else {
+      document.body.classList.remove('dark-mode');
+      toggle.checked = false;
+    }
+  }
+  setMode(saved === 'dark' || (saved === null && prefersDark));
+  toggle.addEventListener('change', function() {
+    const isDark = toggle.checked;
+    document.body.classList.toggle('dark-mode', isDark);
+    localStorage.setItem('dashboard-dark-mode', isDark ? 'dark' : 'light');
+  });
+})();
+</script>
+</body>
+</html>
